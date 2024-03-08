@@ -9,7 +9,7 @@ interface RedditPostData {
   media_link?: string;
 }
 
-interface RedditPostsState {
+export interface RedditPostsState {
   posts: RedditPostData[];
   status: "idle" | "loading" | "succeeded" | "failed";
   error: string | null;

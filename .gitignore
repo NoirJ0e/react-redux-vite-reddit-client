@@ -23,5 +23,3 @@ dist-ssr
 *.sln
 *.sw?
 
-# unit test file (which may contain sensitive data)
-src/**/*.test.ts*
