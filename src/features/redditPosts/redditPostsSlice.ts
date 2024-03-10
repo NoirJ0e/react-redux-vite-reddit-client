@@ -1,12 +1,14 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
+import he from 'he';
 
-interface RedditPostData {
+export interface RedditPostData {
   author: string;
   title: string;
   selftext: string;
   ups: number;
   num_comments: number;
-  media_link?: string;
+  thumbnail: string;
+  createdUtc: number;
 }
 
 export interface RedditPostsState {
@@ -21,6 +23,19 @@ const initialState: RedditPostsState = {
   error: null,
 };
 
+
+export const mapPosts = (json: any) => {
+  return json.data.children.map((child: any) => ({
+    author: child.data.author,
+    title: child.data.title,
+    selftext: child.data.selftext,
+    ups: child.data.ups,
+    num_comments: child.data.num_comments,
+    thumbnail: he.decode(child.data.thumbnail),
+    createdUtc: child.data.created_utc,
+  }));
+};
+
 // async thunk action for fetching Reddit posts
 export const fetchRedditPosts = createAsyncThunk(
   "redditPosts/fetchPosts",
@@ -29,13 +44,7 @@ export const fetchRedditPosts = createAsyncThunk(
       const respond = await fetch(`https://www.reddit.com/r/${subReddit}.json`);
       const json = await respond.json();
 
-      return json.data.children.map((child: any) => ({
-        author: child.data.author,
-        title: child.data.title,
-        selftext: child.data.selftext,
-        ups: child.data.ups,
-        num_comments: child.data.num_comments,
-      }));
+      return mapPosts(json);
     } catch (error) {
       console.error("Error fetching Reddit posts:", error);
     }

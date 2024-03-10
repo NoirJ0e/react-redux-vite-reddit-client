@@ -1,10 +1,14 @@
-import "./App.css"
-import NavBar from "./components/NavBar"
+import "./App.css";
+import NavBar from "./components/NavBar";
+import PostContainer from "./components/PostContainer";
 
 const App = () => {
   return (
-    <NavBar />
-  )
-}
+    <>
+      <NavBar />
+      <PostContainer />
+    </>
+  );
+};
 
-export default App
+export default App;
