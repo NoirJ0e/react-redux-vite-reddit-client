@@ -1,105 +1,37 @@
-import { screen, waitFor } from "@testing-library/react"
-import App from "./App"
-import { renderWithProviders } from "./utils/test-utils"
+// import { screen, waitFor } from "@testing-library/react"
+// import App from "./App"
 
-test("App should have correct initial render", () => {
-  renderWithProviders(<App />)
+// ChatGPT4
+import { configureStore } from '@reduxjs/toolkit';
+import redditPostsReducer, { fetchRedditPosts } from './features/redditPosts/redditPostsSlice';
+import { RedditPostsState } from  './features/redditPosts/redditPostsSlice';
+import {AppDispatch, RootState} from './app/store';
+describe('fetchRedditPosts thunk', () => {
+  let store: ReturnType<typeof configureStore>;
 
-  // The app should be rendered correctly
-  expect(screen.getByText(/learn/i)).toBeInTheDocument()
+  beforeEach(() => {
+    store = configureStore({
+      reducer: {
+        redditPosts: redditPostsReducer,
+      },
+    });
+  });
 
-  // Initial state: count should be 0, incrementValue should be 2
-  expect(screen.getByLabelText("Count")).toHaveTextContent("0")
-  expect(screen.getByLabelText("Set increment amount")).toHaveValue(2)
-})
+  it('should fetch posts and update state on fulfilled', async () => {
+    const subreddit = 'reactjs'; // Example subreddit
 
-test("Increment value and Decrement value should work as expected", async () => {
-  const { user } = renderWithProviders(<App />)
+    // Correctly type dispatch and getState
+    const result = await (store.dispatch as AppDispatch)(fetchRedditPosts(subreddit));
+    const state: RedditPostsState = (store.getState() as RootState).redditPosts;
 
-  // Click on "+" => Count should be 1
-  await user.click(screen.getByLabelText("Increment value"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("1")
-
-  // Click on "-" => Count should be 0
-  await user.click(screen.getByLabelText("Decrement value"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("0")
-})
-
-test("Add Amount should work as expected", async () => {
-  const { user } = renderWithProviders(<App />)
-
-  // "Add Amount" button is clicked => Count should be 2
-  await user.click(screen.getByText("Add Amount"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("2")
-
-  const incrementValueInput = screen.getByLabelText("Set increment amount")
-  // incrementValue is 2, click on "Add Amount" => Count should be 4
-  await user.clear(incrementValueInput)
-  await user.type(incrementValueInput, "2")
-  await user.click(screen.getByText("Add Amount"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("4")
-
-  // [Negative number] incrementValue is -1, click on "Add Amount" => Count should be 3
-  await user.clear(incrementValueInput)
-  await user.type(incrementValueInput, "-1")
-  await user.click(screen.getByText("Add Amount"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("3")
-})
-
-it("Add Async should work as expected", async () => {
-  const { user } = renderWithProviders(<App />)
-
-  // "Add Async" button is clicked => Count should be 2
-  await user.click(screen.getByText("Add Async"))
-
-  await waitFor(() =>
-    expect(screen.getByLabelText("Count")).toHaveTextContent("2"),
-  )
-
-  const incrementValueInput = screen.getByLabelText("Set increment amount")
-  // incrementValue is 2, click on "Add Async" => Count should be 4
-  await user.clear(incrementValueInput)
-  await user.type(incrementValueInput, "2")
-
-  await user.click(screen.getByText("Add Async"))
-  await waitFor(() =>
-    expect(screen.getByLabelText("Count")).toHaveTextContent("4"),
-  )
-
-  // [Negative number] incrementValue is -1, click on "Add Async" => Count should be 3
-  await user.clear(incrementValueInput)
-  await user.type(incrementValueInput, "-1")
-  await user.click(screen.getByText("Add Async"))
-  await waitFor(() =>
-    expect(screen.getByLabelText("Count")).toHaveTextContent("3"),
-  )
-})
-
-test("Add If Odd should work as expected", async () => {
-  const { user } = renderWithProviders(<App />)
-
-  // "Add If Odd" button is clicked => Count should stay 0
-  await user.click(screen.getByText("Add If Odd"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("0")
-
-  // Click on "+" => Count should be updated to 1
-  await user.click(screen.getByLabelText("Increment value"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("1")
-
-  // "Add If Odd" button is clicked => Count should be updated to 3
-  await user.click(screen.getByText("Add If Odd"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("3")
-
-  const incrementValueInput = screen.getByLabelText("Set increment amount")
-  // incrementValue is 1, click on "Add If Odd" => Count should be updated to 4
-  await user.clear(incrementValueInput)
-  await user.type(incrementValueInput, "1")
-  await user.click(screen.getByText("Add If Odd"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("4")
-
-  // click on "Add If Odd" => Count should stay 4
-  await user.clear(incrementValueInput)
-  await user.type(incrementValueInput, "-1")
-  await user.click(screen.getByText("Add If Odd"))
-  expect(screen.getByLabelText("Count")).toHaveTextContent("4")
-})
+    // Assertions remain the same
+    expect(state.status).toEqual('succeeded');
+    expect(state.posts).not.toHaveLength(0);
+    expect(state.error).toBeNull();
+    expect(state.posts[0]).toHaveProperty('author');
+    expect(state.posts[0]).toHaveProperty('title');
+    expect(state.posts[0]).toHaveProperty('selftext');
+    expect(state.posts[0]).toHaveProperty('ups');
+    expect(state.posts[0]).toHaveProperty('num_comments');
+  });
+});
