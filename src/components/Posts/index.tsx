@@ -40,32 +40,42 @@ function Posts(props: RedditPostData) {
       </div>
 
       <div className="col-span-5">
-        <h3 className="text-2xl font-semibold text-center ">
+        <h3 className="text-xl font-semibold text-center ">
           <a href={permaLink}>{title}</a>
         </h3>
-        <p className="text-gray mb-4">{selftext.substring(0, 100)}</p>
-        {isVideo && videoUrl
-          ? (
-            <video controls>
-              <source src={videoUrl} />
-            </video>
-          )
-          : ""}
-        {!isVideo && imgSource ? <img src={imgSource} alt="thumbnail" /> : ""}
+        <p className="text-center text-gray-600 mb-4">{selftext.substring(0, 100)}</p>
+        <div>
+          {isVideo && videoUrl
+            ? (
+              <video controls className="max-w-60 m-auto">
+                <source src={videoUrl} />
+              </video>
+            )
+            : ""}
+          {!isVideo && imgSource
+            ? (
+              <img
+                className="justify-center max-w-60 m-auto"
+                src={imgSource}
+                alt="thumbnail"
+              />
+            )
+            : ""}
+        </div>
 
         <div className="flex justify-between text-xs text-center">
           <div className="flex flex-col">
-            <p>Posted by:</p>
-            <p>{author}</p>
+            <p className="text-gray-500">Posted by:</p>
+            <p className="text-blue-500">{author}</p>
           </div>
-          <div className="flex flex-col">
+          <div className="flex flex-col text-gray-500">
             <p>Posted on:</p>
             <p>{new Date(createdUtc * 1000).toLocaleDateString()}</p>
           </div>
 
           <div className="flex">
-            <img className="max-w-8" src={commentIcon} alt="comment-icon" />
-            <p className="text-sm my-auto">{num_comments}</p>
+            <img className="max-w-6" src={commentIcon} alt="comment-icon" />
+            <p className="text-gray-500 text-sm my-auto">{num_comments}</p>
           </div>
         </div>
       </div>

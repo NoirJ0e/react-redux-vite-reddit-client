@@ -4,10 +4,10 @@ import PostContainer from "./components/PostContainer";
 
 const App = () => {
   return (
-    <>
+    <div className="bg-slate-300">
       <NavBar />
       <PostContainer />
-    </>
+    </div>
   );
 };
 
