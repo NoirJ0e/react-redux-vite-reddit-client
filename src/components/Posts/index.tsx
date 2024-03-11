@@ -43,7 +43,7 @@ function Posts(props: RedditPostData) {
         <h3 className="text-xl font-semibold text-center ">
           <a href={permaLink}>{title}</a>
         </h3>
-        <p className="text-center text-gray-600 mb-4">{selftext.substring(0, 100)}</p>
+        <p className="text-center text-gray-600 mb-4">{selftext.length > 0 ? `${selftext.substring(0, 80)}...` : null}</p>
         <div>
           {isVideo && videoUrl
             ? (

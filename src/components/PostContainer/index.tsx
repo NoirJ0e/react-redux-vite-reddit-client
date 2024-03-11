@@ -1,40 +1,55 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchRedditPosts,
-  mapPosts,
   RedditPostData,
+  selectPosts,
+  selectStatus,
 } from "../../features/redditPosts/redditPostsSlice";
 import Post from "../Posts";
 import { AppDispatch, RootState } from "../../app/store";
-
-// CSS helper
-import mockResponse from "../../mockData/mock-data";
+import InfiniteScroll from "react-infinite-scroll-component";
+import PostLoader from "../PostLoader";
 
 function PostContainer({ subreddit = "popular" }) {
   const dispatch: AppDispatch = useDispatch();
-  const { posts, status } = useSelector((state: RootState) =>
-    state.redditPosts
-  );
+  // const { posts, status } = useSelector((state: RootState) =>
+  //   state.redditPosts
+  // );
+
+  // InfiniteScroll
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const posts = useSelector(selectPosts);
+  const status = useSelector(selectStatus);
+  const loadMore = () => {
+    if (status !== "loading") {
+      setPage((prevPage) => prevPage + 1);
+    }
+  };
+
   useEffect(() => {
-    dispatch(fetchRedditPosts(subreddit));
-  }, [dispatch, subreddit]);
+    dispatch(fetchRedditPosts({ subReddit: 'popular', page }));
+  }, [dispatch, subreddit, page]);
 
-  if (status === "loading") {
-    return <div>Loading...</div>;
-  }
-
-  if (status === "failed") {
-    return <div>Failed to load posts</div>;
-  }
-
-  // const posts = mapPosts(mockResponse);
+  useEffect(() => {
+    if (status === "succeeded") {
+      setHasMore(posts.length > 0);
+    }
+  }, [status, posts]);
 
   return (
     <div>
-      {posts.map((post: RedditPostData, id: number) => (
-        <Post key={id} {...post} />
-      ))}
+      <InfiniteScroll
+        dataLength={posts.length}
+        next={loadMore}
+        hasMore={status !== "idle"}
+        loader={<PostLoader />}
+      >
+        {posts.map((post: RedditPostData) => (
+          <Post key={post.id} {...post} />
+        ))}
+      </InfiniteScroll>
     </div>
   );
 }

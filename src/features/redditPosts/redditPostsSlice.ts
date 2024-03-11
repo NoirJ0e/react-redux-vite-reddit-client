@@ -2,6 +2,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import he from "he";
 
 export interface RedditPostData {
+  id: string;
   url: string;
   author: string;
   title: string;
@@ -30,6 +31,7 @@ const initialState: RedditPostsState = {
 
 export const mapPosts = (json: any) => {
   return json.data.children.map((child: any) => ({
+    id: child.data.id,
     url: child.data.url,
     author: child.data.author,
     title: child.data.title,
@@ -48,9 +50,12 @@ export const mapPosts = (json: any) => {
 // async thunk action for fetching Reddit posts
 export const fetchRedditPosts = createAsyncThunk(
   "redditPosts/fetchPosts",
-  async (subReddit: string) => {
+  async ({ subReddit, page }: { subReddit: string; page: number }) => {
     try {
-      const respond = await fetch(`https://www.reddit.com/r/${subReddit}.json`);
+      console.log(`Fetching post, current page: ${page}`);
+      const respond = await fetch(
+        `https://www.reddit.com/r/${subReddit}.json?&limit=${page * 10 - 2}`,
+      );
       const json = await respond.json();
 
       return mapPosts(json);
@@ -71,13 +76,30 @@ const redditPostsSlice = createSlice({
       })
       .addCase(fetchRedditPosts.fulfilled, (state, action) => {
         state.status = "succeeded";
-        state.posts = action.payload;
+        // state.posts = [...state.posts, ...action.payload];
+        if (action.payload.page === 1) {
+          console.log(`Length of action.payload: ${action.payload.length}`);
+          state.posts = action.payload;
+        } else {
+          const newPosts = action.payload.filter(
+            (post: any) =>
+              !state.posts.some((existingPost) => existingPost.id === post.id),
+          );
+          console.log(`Length of action.payload: ${action.payload.length}`);
+          action.payload.forEach((post: any) => {
+            console.log(post.id);
+          });
+          state.posts = [...state.posts, ...newPosts];
+        }
       })
       .addCase(fetchRedditPosts.rejected, (state, action) => {
         state.status = "failed";
-        state.error = action.error.message || null;
+        state.error = action.error.message ?? "Unknown error";
       });
   },
 });
+
+export const selectPosts = (state) => state.redditPosts.posts;
+export const selectStatus = (state) => state.redditPosts.status;
 
 export default redditPostsSlice.reducer;
