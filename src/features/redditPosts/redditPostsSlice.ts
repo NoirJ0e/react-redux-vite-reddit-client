@@ -1,7 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import he from 'he';
+import he from "he";
 
 export interface RedditPostData {
+  url: string;
   author: string;
   title: string;
   selftext: string;
@@ -9,6 +10,10 @@ export interface RedditPostData {
   num_comments: number;
   thumbnail: string;
   createdUtc: number;
+  permaLink: string;
+  isMediaDomain: boolean;
+  isVideo: boolean;
+  videoUrl: string;
 }
 
 export interface RedditPostsState {
@@ -23,9 +28,9 @@ const initialState: RedditPostsState = {
   error: null,
 };
 
-
 export const mapPosts = (json: any) => {
   return json.data.children.map((child: any) => ({
+    url: child.data.url,
     author: child.data.author,
     title: child.data.title,
     selftext: child.data.selftext,
@@ -33,6 +38,10 @@ export const mapPosts = (json: any) => {
     num_comments: child.data.num_comments,
     thumbnail: he.decode(child.data.thumbnail),
     createdUtc: child.data.created_utc,
+    permaLink: `https://www.reddit.com${child.data.permalink}`,
+    isMediaDomain: child.data.is_reddit_media_domain,
+    isVideo: child.data.is_video,
+    videoUrl: child.data.media?.reddit_video?.fallback_url || "",
   }));
 };
 
