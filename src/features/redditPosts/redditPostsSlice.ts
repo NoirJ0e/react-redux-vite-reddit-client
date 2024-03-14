@@ -52,7 +52,6 @@ export const fetchRedditPosts = createAsyncThunk(
   "redditPosts/fetchPosts",
   async ({ subReddit, page }: { subReddit: string; page: number }) => {
     try {
-      console.log(`Fetching post, current page: ${page}`);
       const respond = await fetch(
         `https://www.reddit.com/r/${subReddit}.json?&limit=${page * 10 - 2}`,
       );
@@ -78,17 +77,12 @@ const redditPostsSlice = createSlice({
         state.status = "succeeded";
         // state.posts = [...state.posts, ...action.payload];
         if (action.payload.page === 1) {
-          console.log(`Length of action.payload: ${action.payload.length}`);
           state.posts = action.payload;
         } else {
           const newPosts = action.payload.filter(
             (post: any) =>
               !state.posts.some((existingPost) => existingPost.id === post.id),
           );
-          console.log(`Length of action.payload: ${action.payload.length}`);
-          action.payload.forEach((post: any) => {
-            console.log(post.id);
-          });
           state.posts = [...state.posts, ...newPosts];
         }
       })
