@@ -4,9 +4,9 @@ A custom Reddit front end application using React and Reddit public API and Tail
 
 ## Roadmap
 
-- [] Better UI
-- [] Dark Mode 
-- [] User Authentication
-- [] Custom Subdeddut
-- [] Up/Down vote 
-- [] Show comments via click on the icon
+- [ ] Better UI
+- [ ] Dark Mode 
+- [ ] User Authentication
+- [ ] Custom Subdeddut
+- [ ] Up/Down vote 
+- [ ] Show comments via click on the icon
