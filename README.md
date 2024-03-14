@@ -10,3 +10,6 @@ A custom Reddit front end application using React and Reddit public API and Tail
 - [ ] Custom Subdeddut
 - [ ] Up/Down vote 
 - [ ] Show comments via click on the icon
+- [ ] User should able to search the data using terms 
+- [ ] Shown a detailed view (new page/component) when click on individual post 
+- [ ] Add animation
